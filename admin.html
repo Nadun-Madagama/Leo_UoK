@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Leo Club</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .admin-header {
+            background: var(--leo-blue);
+            color: var(--leo-white);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .admin-header h1 {
+            color: var(--leo-gold);
+            margin-bottom: 0.5rem;
+        }
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .admin-nav-btn {
+            padding: 10px 20px;
+            background: var(--leo-white);
+            border: 2px solid var(--leo-blue);
+            color: var(--leo-blue);
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .admin-nav-btn:hover,
+        .admin-nav-btn.active {
+            background: var(--leo-blue);
+            color: var(--leo-white);
+        }
+        .admin-section {
+            display: none;
+            background: var(--leo-white);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        .admin-section.active {
+            display: block;
+        }
+        .admin-form {
+            max-width: 800px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .item-list {
+            margin-top: 2rem;
+        }
+        .item-card {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--leo-gold);
+        }
+        .item-info {
+            flex: 1;
+        }
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn-edit, .btn-delete {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-edit {
+            background: var(--leo-blue);
+            color: var(--leo-white);
+        }
+        .btn-edit:hover {
+            background: var(--leo-light-blue);
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: var(--leo-white);
+        }
+        .btn-delete:hover {
+            background: #c82333;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: var(--leo-white);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+        .login-container h2 {
+            color: var(--leo-blue);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #dc3545;
+            color: var(--leo-white);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .file-input-wrapper {
+            margin-top: 10px;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            display: none;
+        }
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <h2>Admin Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+        </form>
+        <div id="loginError" class="form-message error" style="display: none;"></div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" style="display: none;">
+        <div class="admin-container">
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            
+            <div class="admin-header">
+                <h1>Leo Club Admin Panel</h1>
+                <p>Manage your website content easily</p>
+            </div>
+
+            <div class="admin-nav">
+                <button class="admin-nav-btn active" onclick="showSection('content')">Content</button>
+                <button class="admin-nav-btn" onclick="showSection('avenues')">Avenues</button>
+                <button class="admin-nav-btn" onclick="showSection('board')">Board Members</button>
+                <button class="admin-nav-btn" onclick="showSection('projects')">Projects</button>
+                <button class="admin-nav-btn" onclick="showSection('gallery')">Gallery</button>
+            </div>
+
+            <!-- Content Section -->
+            <div id="contentSection" class="admin-section active">
+                <h2>Edit Website Content</h2>
+                <form id="contentForm" class="admin-form">
+                    <div class="form-group">
+                        <label>Home Page Introduction</label>
+                        <textarea id="introText" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>About Leo Club</label>
+                        <textarea id="aboutLeoText" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>About Our Club</label>
+                        <textarea id="aboutClubText" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Vision</label>
+                        <textarea id="visionText" rows="2" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Mission</label>
+                        <textarea id="missionText" rows="2" required></textarea>
+                    </div>
+                    <h3>Contact Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="contactEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" id="contactPhone" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Facebook URL</label>
+                            <input type="url" id="contactFacebook">
+                        </div>
+                        <div class="form-group">
+                            <label>Instagram URL</label>
+                            <input type="url" id="contactInstagram">
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn URL</label>
+                            <input type="url" id="contactLinkedIn">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Content</button>
+                </form>
+                <div id="contentSuccess" class="success-message">Content saved successfully!</div>
+            </div>
+
+            <!-- Avenues Section -->
+            <div id="avenuesSection" class="admin-section">
+                <h2>Manage Avenues</h2>
+                <form id="avenueForm" class="admin-form">
+                    <input type="hidden" id="avenueId">
+                    <div class="form-group">
+                        <label>Avenue Name</label>
+                        <input type="text" id="avenueName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Icon (Emoji)</label>
+                        <input type="text" id="avenueIcon" placeholder="🎯" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="avenueDescription" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Avenue</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetAvenueForm()">Cancel</button>
+                </form>
+                <div class="item-list" id="avenuesList"></div>
+            </div>
+
+            <!-- Board Section -->
+            <div id="boardSection" class="admin-section">
+                <h2>Manage Board Members</h2>
+                <form id="boardForm" class="admin-form">
+                    <input type="hidden" id="boardId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="boardName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Role</label>
+                            <input type="text" id="boardRole" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Photo URL</label>
+                        <input type="url" id="boardPhoto">
+                        <div class="file-input-wrapper">
+                            <input type="file" id="boardPhotoFile" accept="image/*" onchange="handleImageUpload(this, 'boardPhoto')">
+                            <small>Or upload an image (will be converted to base64)</small>
+                        </div>
+                        <img id="boardPhotoPreview" class="image-preview" style="display: none;">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Member</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetBoardForm()">Cancel</button>
+                </form>
+                <div class="item-list" id="boardList"></div>
+            </div>
+
+            <!-- Projects Section -->
+            <div id="projectsSection" class="admin-section">
+                <h2>Manage Projects</h2>
+                <form id="projectForm" class="admin-form">
+                    <input type="hidden" id="projectId">
+                    <div class="form-group">
+                        <label>Project Title</label>
+                        <input type="text" id="projectTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Avenue</label>
+                        <select id="projectAvenue" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="projectDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="url" id="projectImage">
+                        <div class="file-input-wrapper">
+                            <input type="file" id="projectImageFile" accept="image/*" onchange="handleImageUpload(this, 'projectImage')">
+                            <small>Or upload an image (will be converted to base64)</small>
+                        </div>
+                        <img id="projectImagePreview" class="image-preview" style="display: none;">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Project</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetProjectForm()">Cancel</button>
+                </form>
+                <div class="item-list" id="projectsList"></div>
+            </div>
+
+            <!-- Gallery Section -->
+            <div id="gallerySection" class="admin-section">
+                <h2>Manage Gallery</h2>
+                <form id="galleryForm" class="admin-form">
+                    <input type="hidden" id="galleryId">
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="url" id="galleryUrl">
+                        <div class="file-input-wrapper">
+                            <input type="file" id="galleryFile" accept="image/*" onchange="handleImageUpload(this, 'galleryUrl')">
+                            <small>Or upload an image (will be converted to base64)</small>
+                        </div>
+                        <img id="galleryPreview" class="image-preview" style="display: none;">
+                    </div>
+                    <div class="form-group">
+                        <label>Caption</label>
+                        <input type="text" id="galleryCaption" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Image</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetGalleryForm()">Cancel</button>
+                </form>
+                <div class="item-list" id="galleryList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
